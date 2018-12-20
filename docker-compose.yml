@@ -34,12 +34,17 @@ services:
     container_name: redis-socketio
 
   frappe:
+    environment:
+      - FRAPPE_VERSION=v10.1.68
+      - ERPNEXT_VERSION=v10.1.68
     volumes:
+      - ./scripts:/home/frappe/scripts
       - ./frappe-bench:/home/frappe/frappe-bench
       - ./redis-conf/redis_cache.conf:/home/frappe/frappe-bench/config/redis_cache.conf
       - ./redis-conf/redis_queue.conf:/home/frappe/frappe-bench/config/redis_queue.conf
       - ./redis-conf/redis_socketio.conf:/home/frappe/frappe-bench/config/redis_socketio.conf
     build: .
+    command: bash -c "/home/frappe/scripts/run.sh"
     ports:
       - "127.0.0.1:8000:8000" #webserver_port
       - "127.0.0.1:9000:9000" #socketio_port
