@@ -3,45 +3,35 @@ services:
   mariadb:
     image: mariadb
     environment:
-      - MYSQL_ROOT_PASSWORD=123
+      - MYSQL_ROOT_PASSWORD=gHjpN29ZHA8L6BeE
       - MYSQL_USER=root
     volumes:
       - ./conf/mariadb-conf.d:/etc/mysql/conf.d
       - /var/lib/mysql
     ports:
-      - "3307:3306" #mariadb-port
+      - "127.0.0.1:3307:3306" #mariadb-port
     container_name: mariadb
 
   redis-cache:
     image: redis:alpine
-
     volumes:
       - ./redis-conf:/etc/conf.d
-
     command: ["redis-server","/etc/conf.d/redis_cache.conf"]
-
     container_name: redis-cache
 
   redis-queue:
     image: redis:alpine
-
     volumes:
       - ./redis-conf:/etc/conf.d
-
     command: ["redis-server","/etc/conf.d/redis_queue.conf"]
-
     container_name: redis-queue
 
   redis-socketio:
     image: redis:alpine
-
     volumes:
       - ./redis-conf:/etc/conf.d
-
     command: ["redis-server","/etc/conf.d/redis_socketio.conf"]
-
     container_name: redis-socketio
-
 
   frappe:
     volumes:
@@ -51,9 +41,9 @@ services:
       - ./redis-conf/redis_socketio.conf:/home/frappe/frappe-bench/config/redis_socketio.conf
     build: .
     ports:
-      - "8000:8000" #webserver_port
-      - "9000:9000" #socketio_port
-      - "6787:6787" #file_watcher_port
+      - "127.0.0.1:8000:8000" #webserver_port
+      - "127.0.0.1:9000:9000" #socketio_port
+      - "127.0.0.1:6787:6787" #file_watcher_port
     stdin_open: true
     tty: true
     links:
