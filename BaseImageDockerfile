@@ -1,0 +1,51 @@
+FROM ubuntu:16.04
+LABEL MAINTAINER oguya
+
+USER root
+
+## pin bench version
+ARG BENCH_VERSION="master"
+
+ARG FRAPPE_HOMEDIR="/home/frappe"
+ARG FRAPPE_DIR=${FRAPPE_HOMEDIR}/frappe-bench
+
+# Generate locale C.UTF-8 for mariadb and general locale data
+ENV LANG C.UTF-8
+
+## install system deps.
+RUN apt-get update && \
+    apt-get install -y iputils-ping git build-essential python-setuptools python-dev libffi-dev libssl-dev libjpeg8-dev \
+    redis-tools redis-server software-properties-common libxrender1 libxext6 xfonts-75dpi xfonts-base zlib1g-dev libfreetype6-dev \
+    liblcms2-dev libwebp-dev python-tk apt-transport-https libsasl2-dev libldap2-dev libtiff5-dev tcl8.6-dev tk8.6-dev \
+    wget libmysqlclient-dev mariadb-client mariadb-common curl rlwrap redis-tools nano wkhtmltopdf python-pip vim sudo && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+## upgrade pip; create frappe user
+RUN pip install --upgrade setuptools pip && rm -rf ~/.cache/pip
+RUN useradd -ms /bin/bash -G sudo frappe && printf '# User rules for frappe\nfrappe ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers.d/frappe
+
+## install nodejs
+RUN wget -q https://deb.nodesource.com/node_10.x/pool/main/n/nodejs/nodejs_10.10.0-1nodesource1_amd64.deb -O /tmp/nodejs_10.10.0-1nodesource1_amd64.deb && \
+    dpkg -i /tmp/nodejs_10.10.0-1nodesource1_amd64.deb && \
+    rm -f /tmp/nodejs_10.10.0-1nodesource1_amd64.deb
+
+## install bench
+USER frappe
+WORKDIR ${FRAPPE_HOMEDIR}
+RUN git clone -b ${BENCH_VERSION} https://github.com/frappe/bench.git bench-repo
+
+USER root
+RUN pip install -e bench-repo && rm -rf ~/.cache/pip && \
+    npm install -g yarn && \
+    chown -R frappe:frappe ${FRAPPE_HOMEDIR}/*
+
+USER frappe
+WORKDIR ${FRAPPE_DIR}
+
+## add site files & configs
+ONBUILD COPY . ${FRAPPE_DIR}
+ONBUILD COPY ./scripts ${FRAPPE_HOMEDIR}/scripts
+ONBUILD COPY ./redis-conf/redis_cache.conf ${FRAPPE_DIR}/config/redis_cache.conf
+ONBUILD COPY ./redis-conf/redis_queue.conf ${FRAPPE_DIR}/config/redis_queue.conf
+ONBUILD COPY ./redis-conf/redis_socketio.conf ${FRAPPE_DIR}/config/redis_socketio.conf
