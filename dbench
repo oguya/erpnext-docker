@@ -1,11 +1,17 @@
 #!/bin/bash
 
+
+## TODO: find an elagant way of providing erpnext & frappe version
+readonly FRAPPE_VERSION=v10.1.68
+readonly ERPNEXT_VERSION=v10.1.68
+
 if [[ $# -eq 0 ]]; then
     docker exec -it frappe bash
 elif [ "$1" == 'init' ]; then
     docker exec -itu root frappe bash -c "cd /home/frappe && chown -R frappe:frappe ./*"
-    docker exec -i frappe bash -c "cd .. && bench init frappe-bench --ignore-exist --skip-redis-config-generation && cd frappe-bench"
+    docker exec -i frappe bash -c "cd .. && bench init --verbose --frappe-branch $FRAPPE_VERSION frappe-bench --ignore-exist --skip-redis-config-generation && cd frappe-bench"
     docker exec -i frappe bash -c "mv Procfile_docker Procfile && mv sites/common_site_config_docker.json sites/common_site_config.json && bench set-mariadb-host mariadb"
+    docker exec -i frappe bash -c "bench get-app --branch $ERPNEXT_VERSION erpnext https://github.com/frappe/erpnext"
 elif [ "$1" == 'setup' ] && [ "$2" == 'docker' ]; then
         if [ "$3" == '--swarm-mode' ]; then
             echo "Docker swarm mode is not currently supported"
