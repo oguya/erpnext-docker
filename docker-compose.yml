@@ -11,6 +11,7 @@ services:
     ports:
       - "127.0.0.1:3307:3306" #mariadb-port
     container_name: mariadb
+    restart: unless-stopped
 
   redis-cache:
     image: redis:alpine
@@ -18,6 +19,7 @@ services:
       - ./redis-conf:/etc/conf.d
     command: ["redis-server","/etc/conf.d/redis_cache.conf"]
     container_name: redis-cache
+    restart: unless-stopped
 
   redis-queue:
     image: redis:alpine
@@ -25,6 +27,7 @@ services:
       - ./redis-conf:/etc/conf.d
     command: ["redis-server","/etc/conf.d/redis_queue.conf"]
     container_name: redis-queue
+    restart: unless-stopped
 
   redis-socketio:
     image: redis:alpine
@@ -32,6 +35,7 @@ services:
       - ./redis-conf:/etc/conf.d
     command: ["redis-server","/etc/conf.d/redis_socketio.conf"]
     container_name: redis-socketio
+    restart: unless-stopped
 
   frappe:
     environment:
@@ -62,6 +66,7 @@ services:
       - redis-queue
       - redis-socketio
     container_name: frappe
+    restart: unless-stopped
 
   # nginx:
   #   build:
