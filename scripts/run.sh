@@ -18,11 +18,29 @@ if [[ ! -d ${FRAPPE_DIR}/apps/frappe ]]; then
     cp Procfile_docker Procfile
     cp sites/common_site_config_docker.json sites/common_site_config.json
     bench set-mariadb-host mariadb
-elif [[ ! -d ${FRAPPE_DIR}/apps/erpnext ]]; then
+else
+    echo "Frappe app dir already exist...skipping."
+fi
+if [[ ! -d ${FRAPPE_DIR}/apps/erpnext ]]; then
     echo "First time setup! Installing ERPNext $ERPNEXT_VERSION"
     cd $FRAPPE_DIR
     bench get-app --branch $ERPNEXT_VERSION erpnext https://github.com/frappe/erpnext
 else
-    echo "ERPNext and or Frappe apps dir already exist...skipping."
-    bench start
+    echo "ERPNext app dir already exist...skipping."
 fi
+
+echo "Starting Bench"
+cd $FRAPPE_DIR
+
+## TODO: For debug purposes only
+# bench start
+
+## TODO: dev env, no debug
+bench start --no-dev
+
+## TODO: for prod envs
+# cd $FRAPPE_DIR/sites
+# /home/frappe/frappe-bench/env/bin/gunicorn frappe.app:application \
+#     -b 0.0.0.0:8000 \
+#     --workers=4 \
+#     --timeout=120

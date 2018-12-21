@@ -13,6 +13,7 @@ frappe-bench/sites/apps.txt
 frappe-bench/sites/assets/
 frappe-bench/sites/common_site_config.json
 frappe-bench/sites/*/
+frappe-bench/sites/currentsite.txt
 
 ## db data
 mariadb-data
