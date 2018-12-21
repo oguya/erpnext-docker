@@ -1,0 +1,18 @@
+## frappe
+frappe-bench/Procfile
+frappe-bench/apps/
+frappe-bench/config/
+frappe-bench/env/
+frappe-bench/logs/
+frappe-bench/node_modules/
+frappe-bench/package-lock.json
+frappe-bench/package.json
+frappe-bench/patches.txt
+frappe-bench/sites/.build
+frappe-bench/sites/apps.txt
+frappe-bench/sites/assets/
+frappe-bench/sites/common_site_config.json
+frappe-bench/sites/*/
+
+## db data
+mariadb-data
