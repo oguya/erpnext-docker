@@ -7,7 +7,7 @@ services:
       - MYSQL_USER=root
     volumes:
       - ./conf/mariadb-conf.d:/etc/mysql/conf.d
-      - /var/lib/mysql
+      - ./mariadb-data:/var/lib/mysql
     ports:
       - "127.0.0.1:3307:3306" #mariadb-port
     container_name: mariadb
@@ -62,3 +62,33 @@ services:
       - redis-queue
       - redis-socketio
     container_name: frappe
+
+  # nginx:
+  #   build:
+  #     context: .
+  #     dockerfile: docker/nginx/nginx_dockerfile
+  #   volumes:
+  #     - ./docker/nginx:/etc/nginx/conf.d:ro
+  #     - ./frappe-bench:/home/frappe/frappe-bench:ro
+  #   command: nginx-debug -g 'daemon off;'
+  #   depends_on:
+  #     - frappe
+  #   links:
+  #     - frappe
+  #   ports:
+  #     - 127.0.0.1:9090:80
+
+  # ## TODO: prod-ready changes
+  # worker:
+  #   run celery; consume from default, short & long queues
+
+  # scheduler:
+  #   run: bench schedule
+
+  # node_socketio:
+  #   port: 9000
+  #   run: /usr/bin/node /home/badili/frappe-bench/apps/frappe/socketio.js
+
+  # nginx:
+  #   - proxy pass to frappe
+  #   - share volumes with frappe for statics

@@ -1,0 +1,4 @@
+FROM nginx:latest
+RUN mkdir -p /home/frappe/frappe-bench
+ADD ./frappe-bench /home/frappe/frappe-bench
+ADD docker/nginx/*.conf /etc/nginx/conf.d/
