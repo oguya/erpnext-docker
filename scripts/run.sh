@@ -9,6 +9,9 @@ FRAPPE_DIR=${2:-$FRAPPE_HOMEDIR/frappe-bench}
 #FRAPPE_VERSION=v10.1.68
 #ERPNEXT_VERSION=v10.1.68
 
+## change permissions for sanity checks
+sudo chown -R frappe:frappe /home/frappe/frappe-bench
+
 cd $FRAPPE_HOMEDIR
 
 if [[ ! -d ${FRAPPE_DIR}/apps/frappe ]]; then
