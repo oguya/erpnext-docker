@@ -6,12 +6,12 @@ readonly FRAPPE_VERSION=v10.1.68
 readonly ERPNEXT_VERSION=v10.1.68
 
 if [[ $# -eq 0 ]]; then
-    docker exec -it frappe bash
+    docker-compose exec frappe bash
 elif [ "$1" == 'init' ]; then
-    docker exec -itu root frappe bash -c "cd /home/frappe && chown -R frappe:frappe ./*"
-    docker exec -i frappe bash -c "cd .. && bench init --verbose --frappe-branch $FRAPPE_VERSION frappe-bench --ignore-exist --skip-redis-config-generation && cd frappe-bench"
-    docker exec -i frappe bash -c "mv Procfile_docker Procfile && mv sites/common_site_config_docker.json sites/common_site_config.json && bench set-mariadb-host mariadb"
-    docker exec -i frappe bash -c "bench get-app --branch $ERPNEXT_VERSION erpnext https://github.com/frappe/erpnext"
+    docker-compose exec -u root frappe bash -c "cd /home/frappe && chown -R frappe:frappe ./*"
+    docker-compose exec frappe bash -c "cd .. && bench init --verbose --frappe-branch $FRAPPE_VERSION frappe-bench --ignore-exist --skip-redis-config-generation && cd frappe-bench"
+    docker-compose exec frappe bash -c "mv Procfile_docker Procfile && mv sites/common_site_config_docker.json sites/common_site_config.json && bench set-mariadb-host mariadb"
+    docker-compose exec frappe bash -c "bench get-app --branch $ERPNEXT_VERSION erpnext https://github.com/frappe/erpnext"
 elif [ "$1" == 'setup' ] && [ "$2" == 'docker' ]; then
         if [ "$3" == '--swarm-mode' ]; then
             echo "Docker swarm mode is not currently supported"
@@ -24,13 +24,13 @@ elif [ "$1" == 'setup' ] && [ "$2" == 'hosts' ]; then
         a=$(echo $a | tr -d / )
         result="127.0.0.1 ${a}"
         echo $result | sudo tee -a /etc/hosts
-        docker exec -iu root frappe bash -c "echo ${result} | tee --append /etc/hosts"
-        docker exec -itu root frappe bash -c "printf '# User rules for frappe\nfrappe ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers.d/frappe"
+        docker-compose exec -u root frappe bash -c "echo ${result} | tee --append /etc/hosts"
+        docker-compose exec -u root frappe bash -c "printf '# User rules for frappe\nfrappe ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers.d/frappe"
 elif [ "$1" == '-c' ]; then
     shift
     user=$1
     shift
-    docker exec -iu "$user" frappe bash -c "$@"
+    docker-compose exec -u "$user" frappe bash -c "$@"
 elif [ "$1" == '-h' ]; then
     echo "$0 [-h] | [ -c frappe | root <command to run> ] [ <command to send to bench> ]"
     echo ""
@@ -52,5 +52,5 @@ elif [ "$1" == '-h' ]; then
     echo "                Runs a command in bench, i.e. $0 new-site site1.local = bench new-site site1.local"
 else
     IFS=" "
-    docker exec -it frappe bash -c "bench $*"
+    docker-compose exec frappe bash -c "bench $*"
 fi
