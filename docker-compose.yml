@@ -10,7 +10,6 @@ services:
       - ./mariadb-data:/var/lib/mysql
     ports:
       - "127.0.0.1:3307:3306" #mariadb-port
-    container_name: mariadb
     restart: unless-stopped
 
   redis-cache:
@@ -18,7 +17,6 @@ services:
     volumes:
       - ./redis-conf:/etc/conf.d
     command: ["redis-server","/etc/conf.d/redis_cache.conf"]
-    container_name: redis-cache
     restart: unless-stopped
 
   redis-queue:
@@ -26,7 +24,6 @@ services:
     volumes:
       - ./redis-conf:/etc/conf.d
     command: ["redis-server","/etc/conf.d/redis_queue.conf"]
-    container_name: redis-queue
     restart: unless-stopped
 
   redis-socketio:
@@ -34,7 +31,6 @@ services:
     volumes:
       - ./redis-conf:/etc/conf.d
     command: ["redis-server","/etc/conf.d/redis_socketio.conf"]
-    container_name: redis-socketio
     restart: unless-stopped
 
   frappe:
@@ -47,7 +43,9 @@ services:
       - ./redis-conf/redis_cache.conf:/home/frappe/frappe-bench/config/redis_cache.conf
       - ./redis-conf/redis_queue.conf:/home/frappe/frappe-bench/config/redis_queue.conf
       - ./redis-conf/redis_socketio.conf:/home/frappe/frappe-bench/config/redis_socketio.conf
-    build: .
+    build:
+      context: .
+      dockerfile: ./Dockerfile
     command: bash -c "/home/frappe/scripts/run.sh"
     ports:
       - "127.0.0.1:8000:8000" #webserver_port
@@ -65,7 +63,6 @@ services:
       - redis-cache
       - redis-queue
       - redis-socketio
-    container_name: frappe
     restart: unless-stopped
 
   # nginx:
